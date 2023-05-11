@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  brainyfrontend:
+    image: ${DOCKER_REGISTRY-}brainyfrontend
+    build:
+      context: .
+      dockerfile: BrainyFrontEnd/Dockerfile
+    ports:
+      - "51000:50001"
+
+  brainyfrontend-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "BrainyFrontEnd", "-app-port", "80" ]
+    depends_on:
+      - brainyfrontend
+    network_mode: "service:brainyfrontend"
+
+  brainybackend:
+    image: ${DOCKER_REGISTRY-}brainybackend
+    build:
+      context: .
+      dockerfile: BrainyBackEnd/Dockerfile
+    ports:
+      - "52000:50001"
+
+  brainybackend-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "BrainyBackEnd", "-app-port", "80" ]
+    depends_on:
+      - brainybackend
+    network_mode: "service:brainybackend"
+
